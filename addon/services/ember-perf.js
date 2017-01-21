@@ -65,13 +65,13 @@ export default Base.extend(Evented, {
     let transitionRoute = transitionInfo.promise.targetName ||
                           get(transitionInfo.promise, 'intent.name') ||
                           get(transitionInfo.promise, 'state.handlerInfos.lastObject.name');
-    let transitionCtxt = get(transitionInfo.promise, 'intent.contexts') ? (get(transitionInfo.promise, 'intent.contexts') || [])[0] : null;
+    let transitionCtxt = get(transitionInfo.promise, 'intent.contexts') || null;
     let transitionUrl = get(transitionInfo.promise, 'intent.url');
     assert('Must have at least a route name', transitionRoute);
 
     if (!transitionUrl) {
       if (transitionCtxt) {
-        transitionUrl = transitionInfo.promise.router.generate(transitionRoute, transitionCtxt);
+        transitionUrl = transitionInfo.promise.router.generate(transitionRoute, ...transitionCtxt);
       } else {
         let queryParams = get(transitionInfo, 'promise.state.queryParams');
         if (queryParams) {

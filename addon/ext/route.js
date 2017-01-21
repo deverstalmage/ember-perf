@@ -3,7 +3,7 @@ import Ember from 'ember';
 const { Mixin } = Ember;
 
 export default Mixin.create({
-  activate() {
+  setupController() {
     this.get('perfService').routeActivated(this);
     this._super(...arguments);
   },

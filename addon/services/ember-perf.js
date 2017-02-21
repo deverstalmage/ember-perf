@@ -62,16 +62,23 @@ export default Base.extend(Evented, {
       return;
     }
     transitionInfo.promise._emberPerfTransitionId = transitionCounter++;
-    let transitionRoute = transitionInfo.promise.targetName || get(transitionInfo.promise, 'intent.name');
-    let transitionCtxt = get(transitionInfo.promise, 'intent.contexts') ? (get(transitionInfo.promise, 'intent.contexts') || [])[0] : null;
+    let transitionRoute = transitionInfo.promise.targetName ||
+                          get(transitionInfo.promise, 'intent.name') ||
+                          get(transitionInfo.promise, 'state.handlerInfos.lastObject.name');
+    let transitionCtxt = get(transitionInfo.promise, 'intent.contexts') || null;
     let transitionUrl = get(transitionInfo.promise, 'intent.url');
     assert('Must have at least a route name', transitionRoute);
 
     if (!transitionUrl) {
       if (transitionCtxt) {
-        transitionUrl = transitionInfo.promise.router.generate(transitionRoute, transitionCtxt);
+        transitionUrl = transitionInfo.promise.router.generate(transitionRoute, ...transitionCtxt);
       } else {
-        transitionUrl = transitionInfo.promise.router.generate(transitionRoute);
+        let queryParams = get(transitionInfo, 'promise.state.queryParams');
+        if (queryParams) {
+          transitionUrl = transitionInfo.promise.router.generate(transitionRoute, { queryParams });
+        } else {
+          transitionUrl = transitionInfo.promise.router.generate(transitionRoute);
+        }
       }
     }
     this.renderData = this.transitionData = new TransitionData({
